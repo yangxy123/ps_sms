@@ -1,0 +1,57 @@
+spring:
+  profiles: dev
+  datasource:
+     druid:
+        url: jdbc:mysql://127.0.0.1:3306/delivery?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false
+        username: root
+        password: yang751659
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        type: com.alibaba.druid.pool.DruidDataSource
+        #initialSize: 10
+        minIdle: 50
+        maxActive: 100
+        maxWait: 60000
+        time-between-eviction-runs-millis: 60000
+  redis:
+    lettuce:
+      pool:
+        # 连接池最大连接数（使用负值表示没有限制）
+        max-active: 2000
+        # 连接池中的最大空闲连接
+        max-idle: 500
+        # 连接池中的最小空闲连接
+        min-idle: 50
+        # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-wait: 50
+        #在关闭客户端连接之前等待任务处理完成的最长时间，在这之后，无论任务是否执行完成，都会被执行器关闭，默认100ms
+        shutdown-timeout: 100
+        #是否缓存空值
+        cache-null-values: false
+    # 连接超时时间（毫秒）默认是2000ms
+    timeout: 50000
+    #单机配置
+    host: 127.0.0.1
+    port: 6379
+    database: 0
+  rabbitmq:
+    host: 127.0.0.1          # RabbitMQ主机ip
+    port: 5672                                  # RabbitMQ端口
+    username: guest
+    password: guest    
+    listener:
+      simple:
+        # 表示消费者消费成功消息以后需要手工的进行签收（ack确认），默认为 auto
+        #acknowledge-mode: manual
+        concurrency: 5
+        prefetch: 10
+        retry:
+          enabled: true   # 允许消息消费失败的重试
+          max-attempts: 5   # 消息最多消费次数
+          initial-interval: 2000    # 消息多次消费的间隔2秒
+          max-interval: 100000 #重试最大间隔时间
+          multiplier: 2 # 间隔时间乘子
+mybatis-plus:
+    configuration:
+        log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+   
+   

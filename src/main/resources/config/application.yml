@@ -1,0 +1,21 @@
+server:
+  port: 8000
+netty:
+   port: 9901
+spring:
+  application:
+    name: sms
+# JWT配置
+jwt:
+  # 密匙KEY
+  secret: JWTSecret
+  # 正式token
+  tokenHeader: Authorization
+  #试玩token
+  trailTokenHeader: TrailAuthorization
+  # Token前缀字符
+  tokenPrefix: Bearer_
+  # 过期时间 单位秒 1天后过期=86400 7天后过期=604800
+  expiration: 86400
+  # 配置不需要认证的接口
+  antMatchers: /index/**,/login/**,/favicon.ico
