@@ -144,7 +144,7 @@ public class NettyWebSocketHandler extends SimpleChannelInboundHandler<TextWebSo
     		msgDto.setSendTime(new Date());
     		msgDto.setSender(sender);
     		redisUtils.pushList(MsgContants.msgRedisKeySuff, msgDto);
-    		amqUtils.sendDelayedMsg(AmqEnums.MSG_CACHE_DELAYED.exchangeName, AmqEnums.MSG_CACHE_DELAYED.routeKey, JSON.toJSONString(msgDto), 60);
+    		amqUtils.sendDelayedMsg(AmqEnums.MSG_CACHE_DELAYED.exchangeName, AmqEnums.MSG_CACHE_DELAYED.routeKey, JSON.toJSONString(msgDto), 60*10);
     		sendAllMessage(JSON.toJSONString(msgDto));
     	}
     }
