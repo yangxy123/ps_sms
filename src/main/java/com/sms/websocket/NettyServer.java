@@ -58,7 +58,7 @@ public class NettyServer {
                             // 加入chunked 主要作用是支持异步发送的码流（大文件传输），但不专用过多的内存，防止java内存溢出
                             ch.pipeline().addLast(new ChunkedWriteHandler());
                             ch.pipeline().addLast(new NettyWebSocketHandler());
-                            ch.pipeline().addLast(new WebSocketServerProtocolHandler("/websocket", "WebSocket", true, 65536 * 10));
+                            ch.pipeline().addLast(new WebSocketServerProtocolHandler("/websocket", "WebSocket", true, 65536 * 1000));
                             
                         }
                     });
