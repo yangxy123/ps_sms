@@ -54,11 +54,11 @@ public class NettyServer {
                             //websocket协议本身是基于http协议的，所以这边也要使用http解编码器
                             ch.pipeline().addLast("http-decoder", new HttpServerCodec());
                             // 加入ObjectAggregator解码器，作用是他会把多个消息转换为单一的FullHttpRequest或者FullHttpResponse
-                            ch.pipeline().addLast("http-aggregator", new HttpObjectAggregator(1024 * 1024));
+                            ch.pipeline().addLast("http-aggregator", new HttpObjectAggregator(65536));
                             // 加入chunked 主要作用是支持异步发送的码流（大文件传输），但不专用过多的内存，防止java内存溢出
                             ch.pipeline().addLast(new ChunkedWriteHandler());
                             ch.pipeline().addLast(new NettyWebSocketHandler());
-                            ch.pipeline().addLast(new WebSocketServerProtocolHandler("/websocket", "WebSocket", true, 65536 * 100000));
+                            ch.pipeline().addLast(new WebSocketServerProtocolHandler("/websocket", "WebSocket", true, 65536 * 10));
                             
                         }
                     });
