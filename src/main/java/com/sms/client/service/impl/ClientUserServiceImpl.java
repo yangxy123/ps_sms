@@ -59,6 +59,7 @@ public class ClientUserServiceImpl extends ServiceImpl<ClientUserMapper, ClientU
 		
         LoginUserDto loginUserDto = new LoginUserDto();
         loginUserDto.setType(1);
+        loginUserDto.setUserId(clientUserEntity.getId());
         BeanUtils.copyProperties(clientUserEntity, loginUserDto);
         String accessToken = JWTTokenUtil.createAccessToken(loginUserDto);
         LoginResp loginResp = new LoginResp();
