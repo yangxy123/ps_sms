@@ -139,7 +139,7 @@ public class NettyWebSocketHandler extends SimpleChannelInboundHandler<TextWebSo
 		String[] split = sender.split("_");
 		log.info(RedisKeyEnums.MUTE.key+split[0]);
 		if(redisUtils.hasKey(RedisKeyEnums.MUTE.key+split[0])) {
-			sendToUser(split[1], JSON.toJSONString(MsgDto.sysMst("您已被禁言一小时")));
+			sendToUser(sender, JSON.toJSONString(MsgDto.sysMst("您已被禁言一小时")));
 			return;
 		}
     	MsgDto msgDto = null;
