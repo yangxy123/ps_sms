@@ -108,6 +108,7 @@ public class NettyWebSocketHandler extends SimpleChannelInboundHandler<TextWebSo
                 	NettyServer.userChannelMap.put(token, ctx.channel());
                     NettyServer.ChannelIdToUserMap.put(ctx.channel().id().asLongText(), token);
                 }else {
+                	log.info(JSON.toJSONString(loginUserDto));
                 	log.info(loginUserDto.getUserId()+"_"+loginUserDto.getNickName());
                 	NettyServer.userChannelMap.put(loginUserDto.getUserId()+"_"+loginUserDto.getNickName(), ctx.channel());
                     NettyServer.ChannelIdToUserMap.put(ctx.channel().id().asLongText(), loginUserDto.getUserId()+"_"+loginUserDto.getNickName());
