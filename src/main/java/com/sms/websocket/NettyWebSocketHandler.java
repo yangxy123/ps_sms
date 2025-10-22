@@ -99,27 +99,21 @@ public class NettyWebSocketHandler extends SimpleChannelInboundHandler<TextWebSo
             String uri = request.uri();
             Map paramMap=getUrlParams(uri);
             //如果url包含参数，需要处理
-            log.info("1");
             if(uri.contains("/websocket?")){
-                log.info("2");
                 String newUri=uri.substring(0,uri.indexOf("?"));
                 request.setUri(newUri);
                 String token = (String)paramMap.get("token");
                 LoginUserDto loginUserDto = JWTTokenUtil.decodeToke(token);
-                log.info("3");
                 if(ObjectUtils.isEmpty(loginUserDto)) {//游客模式
-                    log.info("4");
                 	NettyServer.userChannelMap.put(token, ctx.channel());
                     NettyServer.ChannelIdToUserMap.put(ctx.channel().id().asLongText(), token);
                 }else {
-                    log.info("5");
                 	NettyServer.userChannelMap.put(loginUserDto.getUserId()+"_"+loginUserDto.getNickName(), ctx.channel());
                     NettyServer.ChannelIdToUserMap.put(ctx.channel().id().asLongText(), loginUserDto.getUserId()+"_"+loginUserDto.getNickName());
                 }
                 
                 loginFlag = true;
             }else {
-                log.info("6");
             	super.channelRead(ctx, msg);
             	ctx.channel().writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(MsgDto.sysMst("连接错误"))));
             	ctx.channel().close();
@@ -130,9 +124,7 @@ public class NettyWebSocketHandler extends SimpleChannelInboundHandler<TextWebSo
             TextWebSocketFrame frame=(TextWebSocketFrame)msg;
         }
         super.channelRead(ctx, msg);
-        log.info("7");
         if(loginFlag) {
-            log.info("8");
             List<Object> allList = redisUtils.getAllList(MsgContants.msgRedisKeySuff);
             if(!allList.isEmpty()) {
             	ctx.channel().writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(allList)));
@@ -149,7 +141,7 @@ public class NettyWebSocketHandler extends SimpleChannelInboundHandler<TextWebSo
 			sendToUser(split[1], JSON.toJSONString(MsgDto.sysMst("您已被禁言一小时")));
 			return;
 		}
-		
+		log.info("1");
     	MsgDto msgDto = null;
     	try {
 			msgDto = JSON.toJavaObject(JSON.parseObject(textWebSocketFrame.text()), MsgDto.class);
@@ -167,7 +159,8 @@ public class NettyWebSocketHandler extends SimpleChannelInboundHandler<TextWebSo
     	if(msgDto.getType() == 5) {//心跳消息不处理
     		return;
     	}
-    	
+
+		log.info("2");
     	if(msgDto.getType() == 1 || msgDto.getType() == 2 || msgDto.getType() == 3 ) {
     		msgDto.setSendTime(new Date());
     		msgDto.setSender(split[1]);
@@ -175,12 +168,19 @@ public class NettyWebSocketHandler extends SimpleChannelInboundHandler<TextWebSo
     		amqUtils.sendDelayedMsg(AmqEnums.MSG_CACHE_DELAYED.exchangeName, AmqEnums.MSG_CACHE_DELAYED.routeKey, JSON.toJSONString(msgDto), 60*10);
     		sendAllMessage(JSON.toJSONString(msgDto));
     	}
-    	
+
+		log.info("3");
     	if(msgDto.getType() == 1) {
+
+    		log.info("4");
     		if(redisUtils.hasKey(RedisKeyEnums.ADMIN_ROBOT.key)) {
+
+    			log.info("5");
         		List<Object> allList = redisUtils.getAllList(RedisKeyEnums.ADMIN_ROBOT.key);
         		List<?> list = allList;
         		List<AdminRobotEntity> reList = (List<AdminRobotEntity>) list;
+
+        		log.info("6");
         		String msg = msgDto.getMsg();
         		String reply = reList.stream().map(AdminRobotEntity::getKeyWord).filter(vo->msg.indexOf(vo) >= 0).max(Comparator.comparingInt(String::length)).orElse(null);
         		if(!StringUtils.isEmpty(reply)) {
