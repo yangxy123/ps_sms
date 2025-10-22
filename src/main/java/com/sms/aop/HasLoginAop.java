@@ -24,7 +24,7 @@ public class HasLoginAop {
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
 		LoginUserDto loginUser = SecurityFrameworkUtils.getLoginUser();
 		if(ObjectUtils.isEmpty(loginUser)) {
-			throw new LoginException("Notloggedin");
+			throw new LoginException("未登录");
 		}
         return joinPoint.proceed();
     }

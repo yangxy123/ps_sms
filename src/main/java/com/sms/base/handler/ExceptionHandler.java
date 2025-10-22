@@ -11,6 +11,7 @@ import com.sms.exception.AuthorityException;
 import com.sms.exception.BusinessException;
 import com.sms.exception.DecryptException;
 import com.sms.exception.JWTExcepiton;
+import com.sms.exception.LoginException;
 import com.sms.exception.ParamException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -84,5 +85,11 @@ public class ExceptionHandler {
 	@org.springframework.web.bind.annotation.ExceptionHandler({ ParamException.class })
 	public ApiResp<String> paramExceptionHandler(ParamException e) {
 		return ApiResp.paramError(e.getMessage());
+	}
+	
+	@ResponseBody
+	@org.springframework.web.bind.annotation.ExceptionHandler({ LoginException.class })
+	public ApiResp<String> paramExceptionHandler(LoginException e) {
+		return ApiResp.bussError(e.getMessage());
 	}
 }
