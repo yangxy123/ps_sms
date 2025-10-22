@@ -80,7 +80,7 @@ public class AdminUserController {
 	}
 	
 //	@HasLogin
-	@GetMapping("/createUser")
+	@PostMapping("/createUser")
 	@ApiOperation("创建用户")
 	public ApiResp<String> createUser(@RequestBody @Valid AdminCreateUserReq adminCreateUserReq){
 		return adminUserService.createUser(adminCreateUserReq);
