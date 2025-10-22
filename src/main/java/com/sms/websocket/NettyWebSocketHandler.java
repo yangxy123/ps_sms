@@ -160,8 +160,10 @@ public class NettyWebSocketHandler extends SimpleChannelInboundHandler<TextWebSo
     	}
 
     	if(msgDto.getType() == 1 || msgDto.getType() == 2 || msgDto.getType() == 3 ) {
+    		log.info(sender);
     		msgDto.setSendTime(new Date());
     		msgDto.setSender(split[1].length() == 2?split[1]:sender);
+    		log.info(2);
     		redisUtils.pushList(MsgContants.msgRedisKeySuff, msgDto);
     		amqUtils.sendDelayedMsg(AmqEnums.MSG_CACHE_DELAYED.exchangeName, AmqEnums.MSG_CACHE_DELAYED.routeKey, JSON.toJSONString(msgDto), 60*10);
     		sendAllMessage(JSON.toJSONString(msgDto));
