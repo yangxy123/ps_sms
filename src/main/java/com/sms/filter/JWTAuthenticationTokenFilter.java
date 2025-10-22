@@ -49,24 +49,27 @@ public class JWTAuthenticationTokenFilter extends BasicAuthenticationFilter {
             	LoginUserDto loginDto = JWTTokenUtil.decodeToke(token);
             	String keySuff = null;
             	
-            	if(loginDto.getType() == 1) {//1客户端用户
-            		keySuff = RedisKeyEnums.CLIENT_LOGIN_TOKEN.key;
-            	}else if(loginDto.getType() == 2) {//2管理端用户
-            		keySuff = RedisKeyEnums.ADMIN_LOGIN_TOKEN.key;
-            	}
-            	if(!ObjectUtils.isEmpty(loginDto)) {
-            		if (redisUtils.hasKey(keySuff+loginDto.getTelPhone())){
-						String token1 = (String) redisUtils.get(keySuff+loginDto.getTelPhone());
-						if(token.equals(token1)) {
-							if(redisUtils.getExpire(redisUtils+loginDto.getTelPhone()) <= 30*60) {//过期时间小于等于半小时自动续期
-								redisUtils.expire(redisUtils+loginDto.getTelPhone(), 2*60*60);
+            	if (!ObjectUtils.isEmpty(loginDto)) {
+					if (loginDto.getType() == 1) {//1客户端用户
+						keySuff = RedisKeyEnums.CLIENT_LOGIN_TOKEN.key;
+					} else if (loginDto.getType() == 2) {//2管理端用户
+						keySuff = RedisKeyEnums.ADMIN_LOGIN_TOKEN.key;
+					}
+					if (!ObjectUtils.isEmpty(loginDto)) {
+						if (redisUtils.hasKey(keySuff + loginDto.getTelPhone())) {
+							String token1 = (String) redisUtils.get(keySuff + loginDto.getTelPhone());
+							if (token.equals(token1)) {
+								if (redisUtils.getExpire(redisUtils + loginDto.getTelPhone()) <= 30 * 60) {//过期时间小于等于半小时自动续期
+									redisUtils.expire(redisUtils + loginDto.getTelPhone(), 2 * 60 * 60);
+								}
+								UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+										loginDto, loginDto.getUserId(), Collections.emptyList());
+								SecurityContextHolder.getContext().setAuthentication(authentication);
 							}
-							UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(loginDto, loginDto.getUserId(), Collections.emptyList());
-							SecurityContextHolder.getContext().setAuthentication(authentication);
+
 						}
-						
 					} 
-            	}
+				}
         	}
         }
 		
