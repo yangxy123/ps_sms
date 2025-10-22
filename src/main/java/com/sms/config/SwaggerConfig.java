@@ -36,7 +36,7 @@ public class SwaggerConfig {
                         )
                 )
 				.select()
-				.apis(RequestHandlerSelectors.basePackage("com.aia"))
+				.apis(RequestHandlerSelectors.basePackage("com.sms"))
 				.paths(PathSelectors.any())
 				.build();
 	}
