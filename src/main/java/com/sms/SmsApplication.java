@@ -1,7 +1,9 @@
 package com.sms;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.core.env.Environment;
 
 import com.sms.util.DefaultProfileUtil;
@@ -14,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 */
 @Slf4j
 @SpringBootApplication
+@EnableAspectJAutoProxy
+@MapperScan(basePackages = "com.sms.**.mapper")
 public class SmsApplication {
 	public static void main( String[] args )
     {

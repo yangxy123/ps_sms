@@ -1,22 +1,29 @@
 package com.sms.websocket;
 
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson.JSON;
+import com.sms.admin.entity.AdminRobotEntity;
 import com.sms.contants.MsgContants;
+import com.sms.dto.LoginUserDto;
 import com.sms.dto.MsgDto;
 import com.sms.enums.AmqEnums;
+import com.sms.enums.RedisKeyEnums;
 import com.sms.util.AmqUtils;
+import com.sms.util.JWTTokenUtil;
 import com.sms.util.RedisUtils;
 import com.sms.util.SpringUtil;
 
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -96,8 +103,15 @@ public class NettyWebSocketHandler extends SimpleChannelInboundHandler<TextWebSo
                 String newUri=uri.substring(0,uri.indexOf("?"));
                 request.setUri(newUri);
                 String token = (String)paramMap.get("token");
-                NettyServer.userChannelMap.put(token, ctx.channel());
-                NettyServer.ChannelIdToUserMap.put(ctx.channel().id().asLongText(), token);
+                LoginUserDto loginUserDto = JWTTokenUtil.decodeToke(token);
+                if(ObjectUtils.isEmpty(loginUserDto)) {//游客模式
+                	NettyServer.userChannelMap.put(token, ctx.channel());
+                    NettyServer.ChannelIdToUserMap.put(ctx.channel().id().asLongText(), token);
+                }else {
+                	NettyServer.userChannelMap.put(loginUserDto.getUserId()+"_"+loginUserDto.getNickName(), ctx.channel());
+                    NettyServer.ChannelIdToUserMap.put(ctx.channel().id().asLongText(), loginUserDto.getUserId()+"_"+loginUserDto.getNickName());
+                }
+                
                 loginFlag = true;
             }else {
             	super.channelRead(ctx, msg);
@@ -121,6 +135,13 @@ public class NettyWebSocketHandler extends SimpleChannelInboundHandler<TextWebSo
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame textWebSocketFrame) throws Exception {
 		init();
+		String sender = NettyServer.ChannelIdToUserMap.get(ctx.channel().id().asLongText());
+		String[] split = sender.split("_");
+		if(redisUtils.hasKey(RedisKeyEnums.MUTE+split[0])) {
+			sendToUser(split[1], JSON.toJSONString(MsgDto.sysMst("您已被禁言一小时")));
+			return;
+		}
+		
     	MsgDto msgDto = null;
     	try {
 			msgDto = JSON.toJavaObject(JSON.parseObject(textWebSocketFrame.text()), MsgDto.class);
@@ -140,13 +161,26 @@ public class NettyWebSocketHandler extends SimpleChannelInboundHandler<TextWebSo
     	}
     	
     	if(msgDto.getType() == 1 || msgDto.getType() == 2 || msgDto.getType() == 3 ) {
-    		String sender = NettyServer.ChannelIdToUserMap.get(ctx.channel().id().asLongText());
     		msgDto.setSendTime(new Date());
-    		msgDto.setSender(sender);
+    		msgDto.setSender(split[1]);
     		redisUtils.pushList(MsgContants.msgRedisKeySuff, msgDto);
     		amqUtils.sendDelayedMsg(AmqEnums.MSG_CACHE_DELAYED.exchangeName, AmqEnums.MSG_CACHE_DELAYED.routeKey, JSON.toJSONString(msgDto), 60*10);
     		sendAllMessage(JSON.toJSONString(msgDto));
     	}
+    	
+    	if(msgDto.getType() == 1) {
+    		if(redisUtils.hasKey(RedisKeyEnums.ADMIN_ROBOT.key)) {
+        		List<Object> allList = redisUtils.getAllList(RedisKeyEnums.ADMIN_ROBOT.key);
+        		List<?> list = allList;
+        		List<AdminRobotEntity> reList = (List<AdminRobotEntity>) list;
+        		String msg = msgDto.getMsg();
+        		String reply = reList.stream().map(AdminRobotEntity::getKeyWord).filter(vo->msg.indexOf(vo) >= 0).max(Comparator.comparingInt(String::length)).orElse(null);
+        		if(!StringUtils.isEmpty(reply)) {
+        			sendAllMessage(JSON.toJSONString(MsgDto.sysMst(reply)));
+        		}
+    		}
+    	}
+    	
     }
     
     /**
@@ -180,13 +214,10 @@ public class NettyWebSocketHandler extends SimpleChannelInboundHandler<TextWebSo
         }
     }
     
-    public static void main(String[] args) {
-    	MsgDto msgDto = new MsgDto();
-    	msgDto.setType(1);
-    	msgDto.setMsg("11");
-    	msgDto.setPicture("图片（base64）");
-    	msgDto.setSender("发送人（发送消息时不用带该参数）");
-    	msgDto.setSendTime(new Date());
-    	System.out.println(JSON.toJSONString(msgDto));
+    public void sendToUser(String user,String msg) {
+    	Channel channel = NettyServer.userChannelMap.get(user);
+    	if(!ObjectUtils.isEmpty(channel)) {
+    		channel.writeAndFlush(new TextWebSocketFrame(msg));
+    	}
     }
 }
