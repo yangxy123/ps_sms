@@ -100,7 +100,9 @@ public class AdminRobotServiceImpl extends ServiceImpl<AdminRobotMapper, AdminRo
 	public ApiResp<String> refreshCache() {
 		// TODO Auto-generated method stub
 		List<AdminRobotEntity> list = list(new QueryWrapper<AdminRobotEntity>().lambda().eq(AdminRobotEntity::getStatus, 1));
-		redisUtils.pushAllList(RedisKeyEnums.ADMIN_ROBOT.key, list);
+		if(!list.isEmpty()) {
+			redisUtils.pushAllList(RedisKeyEnums.ADMIN_ROBOT.key, list);
+		}
 		return ApiResp.sucess();
 	}
 

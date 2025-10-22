@@ -30,7 +30,9 @@ public class RobotInit implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 		// TODO Auto-generated method stub
 		List<AdminRobotEntity> list = adminRobotService.list(new QueryWrapper<AdminRobotEntity>().lambda().eq(AdminRobotEntity::getStatus, 1));
-		redisUtils.pushAllList(RedisKeyEnums.ADMIN_ROBOT.key, list);
+		if(!list.isEmpty()) {
+			redisUtils.pushAllList(RedisKeyEnums.ADMIN_ROBOT.key, list);
+		}
 		log.info("机器人关键词初始化");
 	}
 
