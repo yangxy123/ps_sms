@@ -141,7 +141,6 @@ public class NettyWebSocketHandler extends SimpleChannelInboundHandler<TextWebSo
 			sendToUser(split[1], JSON.toJSONString(MsgDto.sysMst("您已被禁言一小时")));
 			return;
 		}
-		log.info("1");
     	MsgDto msgDto = null;
     	try {
 			msgDto = JSON.toJavaObject(JSON.parseObject(textWebSocketFrame.text()), MsgDto.class);
@@ -160,27 +159,22 @@ public class NettyWebSocketHandler extends SimpleChannelInboundHandler<TextWebSo
     		return;
     	}
 
-		log.info("2");
     	if(msgDto.getType() == 1 || msgDto.getType() == 2 || msgDto.getType() == 3 ) {
     		msgDto.setSendTime(new Date());
-    		msgDto.setSender(split[1]);
+    		msgDto.setSender(split[1].length() == 2?split[1]:sender);
     		redisUtils.pushList(MsgContants.msgRedisKeySuff, msgDto);
     		amqUtils.sendDelayedMsg(AmqEnums.MSG_CACHE_DELAYED.exchangeName, AmqEnums.MSG_CACHE_DELAYED.routeKey, JSON.toJSONString(msgDto), 60*10);
     		sendAllMessage(JSON.toJSONString(msgDto));
     	}
 
-		log.info("3");
     	if(msgDto.getType() == 1) {
 
-    		log.info("4");
     		if(redisUtils.hasKey(RedisKeyEnums.ADMIN_ROBOT.key)) {
 
-    			log.info("5");
         		List<Object> allList = redisUtils.getAllList(RedisKeyEnums.ADMIN_ROBOT.key);
         		List<?> list = allList;
         		List<AdminRobotEntity> reList = (List<AdminRobotEntity>) list;
 
-        		log.info("6");
         		String msg = msgDto.getMsg();
         		String reply = reList.stream().map(AdminRobotEntity::getKeyWord).filter(vo->msg.indexOf(vo) >= 0).max(Comparator.comparingInt(String::length)).orElse(null);
         		if(!StringUtils.isEmpty(reply)) {
