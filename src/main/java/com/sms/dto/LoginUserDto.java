@@ -12,7 +12,7 @@ public class LoginUserDto {
 	private Long userId;
 	
 	@ApiModelProperty(value = "昵称")
-	private String nickName;
+	private String nickeName;
 
 	@ApiModelProperty(value = "电话号码")
 	private String telPhone;
