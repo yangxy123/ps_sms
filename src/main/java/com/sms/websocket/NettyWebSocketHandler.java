@@ -108,8 +108,6 @@ public class NettyWebSocketHandler extends SimpleChannelInboundHandler<TextWebSo
                 	NettyServer.userChannelMap.put(token, ctx.channel());
                     NettyServer.ChannelIdToUserMap.put(ctx.channel().id().asLongText(), token);
                 }else {
-                	log.info(JSON.toJSONString(loginUserDto));
-                	log.info(loginUserDto.getUserId()+"_"+loginUserDto.getNickeName());
                 	NettyServer.userChannelMap.put(loginUserDto.getUserId()+"_"+loginUserDto.getNickeName(), ctx.channel());
                     NettyServer.ChannelIdToUserMap.put(ctx.channel().id().asLongText(), loginUserDto.getUserId()+"_"+loginUserDto.getNickeName());
                 }
@@ -139,6 +137,7 @@ public class NettyWebSocketHandler extends SimpleChannelInboundHandler<TextWebSo
 		init();
 		String sender = NettyServer.ChannelIdToUserMap.get(ctx.channel().id().asLongText());
 		String[] split = sender.split("_");
+		log.info(RedisKeyEnums.MUTE+split[0]);
 		if(redisUtils.hasKey(RedisKeyEnums.MUTE+split[0])) {
 			sendToUser(split[1], JSON.toJSONString(MsgDto.sysMst("您已被禁言一小时")));
 			return;

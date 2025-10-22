@@ -29,10 +29,13 @@ import com.sms.util.RedisUtils;
 import com.sms.util.SecurityFrameworkUtils;
 import com.sms.websocket.NettyWebSocketHandler;
 
+import lombok.extern.slf4j.Slf4j;
+
 /** 
 * @author yangxy
 * @version 创建时间：2025年10月22日 上午9:18:01 
 */
+@Slf4j
 @Service
 public class ClientUserServiceImpl extends ServiceImpl<ClientUserMapper, ClientUserEntity> implements ClientUserService {
 	@Autowired
@@ -134,6 +137,7 @@ public class ClientUserServiceImpl extends ServiceImpl<ClientUserMapper, ClientU
 		
 		ClientUserEntity clientUserEntity = getById(id);
 		redisUtils.set(RedisKeyEnums.MUTE.key+clientUserEntity.getId(), clientUserEntity,60*60);
+		log.info(RedisKeyEnums.MUTE.key+clientUserEntity.getId());
 		nettyWebSocketHandler.sendToUser(clientUserEntity.getId() + "_" + clientUserEntity.getNickeName(), JSON.toJSONString(MsgDto.sysMst("您已被禁言一小时")));
 		return ApiResp.sucess();
 	}
