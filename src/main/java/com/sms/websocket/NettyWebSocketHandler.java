@@ -104,7 +104,6 @@ public class NettyWebSocketHandler extends SimpleChannelInboundHandler<TextWebSo
                 request.setUri(newUri);
                 String token = (String)paramMap.get("token");
                 LoginUserDto loginUserDto = JWTTokenUtil.decodeToke(token);
-                log.info(JSON.toJSONString(loginUserDto));
                 if(ObjectUtils.isEmpty(loginUserDto)) {//游客模式
                 	NettyServer.userChannelMap.put(token, ctx.channel());
                     NettyServer.ChannelIdToUserMap.put(ctx.channel().id().asLongText(), token);
@@ -218,6 +217,7 @@ public class NettyWebSocketHandler extends SimpleChannelInboundHandler<TextWebSo
     }
     
     public void sendToUser(String user,String msg) {
+    	log.info(user);
     	Channel channel = NettyServer.userChannelMap.get(user);
     	if(!ObjectUtils.isEmpty(channel)) {
     		channel.writeAndFlush(new TextWebSocketFrame(msg));
