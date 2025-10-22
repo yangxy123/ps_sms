@@ -77,7 +77,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 			throw new BusinessException("用户不存在");
 		}
 		
-		boolean matches = bCryptPasswordEncoder.matches(adminUserEntity.getPassWord(),adminLoginReq.getPassWord());
+		boolean matches = bCryptPasswordEncoder.matches(adminLoginReq.getPassWord(),adminUserEntity.getPassWord());
 
         if(!matches){
             throw new BusinessException("用户名或密码错误");
@@ -113,7 +113,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
 		
 		LoginUserDto loginUser = SecurityFrameworkUtils.getLoginUser();
 		AdminUserEntity adminUserEntity = getById(loginUser.getUserId());
-		boolean matches = bCryptPasswordEncoder.matches(adminUserEntity.getPassWord(),adminUpdatePwdReq.getOldPassWord());
+		boolean matches = bCryptPasswordEncoder.matches(adminUpdatePwdReq.getOldPassWord(),adminUserEntity.getPassWord());
 		if(!matches){
             throw new BusinessException("原密码错误");
         }

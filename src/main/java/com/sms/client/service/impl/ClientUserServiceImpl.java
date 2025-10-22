@@ -51,7 +51,7 @@ public class ClientUserServiceImpl extends ServiceImpl<ClientUserMapper, ClientU
 			throw new ApiBussException("用户不存在");
 		}
 		
-		boolean matches = bCryptPasswordEncoder.matches(clientUserEntity.getPassWord(),clientLoginReq.getPassWord());
+		boolean matches = bCryptPasswordEncoder.matches(clientLoginReq.getPassWord(),clientUserEntity.getPassWord());
 
         if(!matches){
             throw new BusinessException("用户名或密码错误");
@@ -112,7 +112,7 @@ public class ClientUserServiceImpl extends ServiceImpl<ClientUserMapper, ClientU
 		
 		LoginUserDto loginUser = SecurityFrameworkUtils.getLoginUser();
 		ClientUserEntity clientUserEntity = getById(loginUser.getUserId());
-		boolean matches = bCryptPasswordEncoder.matches(clientUserEntity.getPassWord(),clientUserUpdateWordReq.getOldPassWord());
+		boolean matches = bCryptPasswordEncoder.matches(clientUserUpdateWordReq.getOldPassWord(),clientUserEntity.getPassWord());
 		if(!matches){
             throw new BusinessException("原密码错误");
         }
