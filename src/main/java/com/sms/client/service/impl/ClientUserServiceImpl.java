@@ -80,14 +80,14 @@ public class ClientUserServiceImpl extends ServiceImpl<ClientUserMapper, ClientU
 	@SuppressWarnings("unchecked")
 	public ApiResp<String> register(ClientUserRegisterReq clientUserRegisterReq) {
 		// TODO Auto-generated method stub
-		if(!redisUtils.hasKey(RedisKeyEnums.CAPTCHA.key+clientUserRegisterReq.getTelPhone())) {
-			throw new BusinessException("验证码已过期");
-		}
-		
-		String code = (String) redisUtils.get(RedisKeyEnums.CAPTCHA.key+clientUserRegisterReq.getTelPhone());
-		if(!clientUserRegisterReq.getCode().equals(code)) {
-			throw new BusinessException("验证码错误");
-		}
+//		if(!redisUtils.hasKey(RedisKeyEnums.CAPTCHA.key+clientUserRegisterReq.getTelPhone())) {
+//			throw new BusinessException("验证码已过期");
+//		}
+//		
+//		String code = (String) redisUtils.get(RedisKeyEnums.CAPTCHA.key+clientUserRegisterReq.getTelPhone());
+//		if(!clientUserRegisterReq.getCode().equals(code)) {
+//			throw new BusinessException("验证码错误");
+//		}
 		
 		ClientUserEntity checkClientUserEntity = getOne(new QueryWrapper<ClientUserEntity>().lambda().eq(ClientUserEntity::getTelPhone, clientUserRegisterReq.getTelPhone()));
 		if(!ObjectUtils.isEmpty(checkClientUserEntity)) {
