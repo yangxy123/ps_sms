@@ -90,6 +90,7 @@ public class ExceptionHandler {
 	@ResponseBody
 	@org.springframework.web.bind.annotation.ExceptionHandler({ LoginException.class })
 	public ApiResp<String> loginExceptionHandler(LoginException e) {
+		log.info("1");
 		return ApiResp.bussError(e.getMessage());
 	}
 }
