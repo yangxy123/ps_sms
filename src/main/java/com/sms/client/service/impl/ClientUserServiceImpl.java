@@ -133,7 +133,7 @@ public class ClientUserServiceImpl extends ServiceImpl<ClientUserMapper, ClientU
 		}
 		
 		ClientUserEntity clientUserEntity = getById(id);
-		redisUtils.set(RedisKeyEnums.MUTE+clientUserEntity.getNickeName(), clientUserEntity,60*60);
+		redisUtils.set(RedisKeyEnums.MUTE.key+clientUserEntity.getId(), clientUserEntity,60*60);
 		nettyWebSocketHandler.sendToUser(clientUserEntity.getId() + "_" + clientUserEntity.getNickeName(), JSON.toJSONString(MsgDto.sysMst("您已被禁言一小时")));
 		return ApiResp.sucess();
 	}
