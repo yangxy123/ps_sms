@@ -99,21 +99,27 @@ public class NettyWebSocketHandler extends SimpleChannelInboundHandler<TextWebSo
             String uri = request.uri();
             Map paramMap=getUrlParams(uri);
             //如果url包含参数，需要处理
+            log.info("1");
             if(uri.contains("/websocket?")){
+                log.info("2");
                 String newUri=uri.substring(0,uri.indexOf("?"));
                 request.setUri(newUri);
                 String token = (String)paramMap.get("token");
                 LoginUserDto loginUserDto = JWTTokenUtil.decodeToke(token);
+                log.info("3");
                 if(ObjectUtils.isEmpty(loginUserDto)) {//游客模式
+                    log.info("4");
                 	NettyServer.userChannelMap.put(token, ctx.channel());
                     NettyServer.ChannelIdToUserMap.put(ctx.channel().id().asLongText(), token);
                 }else {
+                    log.info("5");
                 	NettyServer.userChannelMap.put(loginUserDto.getUserId()+"_"+loginUserDto.getNickName(), ctx.channel());
                     NettyServer.ChannelIdToUserMap.put(ctx.channel().id().asLongText(), loginUserDto.getUserId()+"_"+loginUserDto.getNickName());
                 }
                 
                 loginFlag = true;
             }else {
+                log.info("6");
             	super.channelRead(ctx, msg);
             	ctx.channel().writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(MsgDto.sysMst("连接错误"))));
             	ctx.channel().close();
@@ -124,7 +130,9 @@ public class NettyWebSocketHandler extends SimpleChannelInboundHandler<TextWebSo
             TextWebSocketFrame frame=(TextWebSocketFrame)msg;
         }
         super.channelRead(ctx, msg);
+        log.info("7");
         if(loginFlag) {
+            log.info("8");
             List<Object> allList = redisUtils.getAllList(MsgContants.msgRedisKeySuff);
             if(!allList.isEmpty()) {
             	ctx.channel().writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(allList)));
