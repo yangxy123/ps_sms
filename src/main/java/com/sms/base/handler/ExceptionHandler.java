@@ -11,7 +11,7 @@ import com.sms.exception.AuthorityException;
 import com.sms.exception.BusinessException;
 import com.sms.exception.DecryptException;
 import com.sms.exception.JWTExcepiton;
-import com.sms.exception.LoginException;
+import com.sms.exception.NotLoginException;
 import com.sms.exception.ParamException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -88,9 +88,8 @@ public class ExceptionHandler {
 	}
 	
 	@ResponseBody
-	@org.springframework.web.bind.annotation.ExceptionHandler({ LoginException.class })
-	public ApiResp<String> loginExceptionHandler(LoginException e) {
-		log.info("1");
-		return ApiResp.bussError(e.getMessage());
+	@org.springframework.web.bind.annotation.ExceptionHandler({ NotLoginException.class })
+	public ApiResp<String> loginExceptionHandler(NotLoginException e) {
+		return ApiResp.notLogin();
 	}
 }

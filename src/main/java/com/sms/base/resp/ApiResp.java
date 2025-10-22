@@ -124,6 +124,11 @@ public class ApiResp<T> {
 		return new ApiResp(ResCodeContants.CODE_ERROR,desc,null);
 	}
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static ApiResp notLogin() {
+		return new ApiResp(ResCodeContants.NOT_LOGIN,"未登录",null);
+	}
+	
 	/**
 	 * 返回分页数据
 	* @author yangxy

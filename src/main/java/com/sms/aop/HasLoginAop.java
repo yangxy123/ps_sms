@@ -1,7 +1,5 @@
 package com.sms.aop;
 
-import javax.security.auth.login.LoginException;
-
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -10,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
 import com.sms.dto.LoginUserDto;
+import com.sms.exception.NotLoginException;
 import com.sms.util.SecurityFrameworkUtils;
 
 /** 
@@ -24,7 +23,7 @@ public class HasLoginAop {
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
 		LoginUserDto loginUser = SecurityFrameworkUtils.getLoginUser();
 		if(ObjectUtils.isEmpty(loginUser)) {
-			throw new LoginException("未登录");
+			throw new NotLoginException("未登录");
 		}
         return joinPoint.proceed();
     }

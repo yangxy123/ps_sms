@@ -40,4 +40,10 @@ public interface ResCodeContants {
 	 * 验证码错误
 	 */
 	public static final String CODE_ERROR = "000106";
+	
+
+	/**
+	 * 未登录
+	 */
+	public static final String NOT_LOGIN = "000107";
 }
